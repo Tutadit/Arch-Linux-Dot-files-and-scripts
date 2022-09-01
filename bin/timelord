@@ -1,0 +1,4 @@
+#!/bin/bash
+
+(alacritty -t "TimelordCalendar" -e ikhal &)
+(alacritty -t "TimelordTask" -e vit &)

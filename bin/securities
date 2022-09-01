@@ -1,0 +1,60 @@
+#!/bin/bash
+source /home/jp/.cache/wal/colors.var.sh
+
+SECURITIES="/home/jp/.local/share/securities/following.json"
+CODES=$(cat $SECURITIES | python -c "import sys, json; from functools import reduce; print(reduce(lambda a,b: a + '\n' + b, map(lambda c: c['symbol'], json.load(sys.stdin))  ))")
+
+SELECTED=$(echo -e "ALL\n$CODES" | dmenu -i -b -h 32 -fn "Roboto-10:bold" -nb $color0 -sb $color2 -sf $color0)
+
+
+
+get_news_window() {
+    NEWS_TITLE="NewsByJP"
+    NEWS=$(xdotool search --name "$NEWS_TITLE" | head -n 1)
+    if [[ -z $NEWS ]]; then
+        (alacritty -t $NEWS_TITLE -e news &)
+        sleep 0.8
+        NEWS=$(xdotool search --name "$NEWS_TITLE" | head -n 1)
+        while [[ -z $NEWS ]]; do
+            sleep 0.8
+            NEWS=$(xdotool search --name "$NEWS_TITLE" | head -n 1)
+        done
+    fi
+}
+
+get_tickrs_window() {
+
+    if [ $SELECTED = "ALL" ]; then
+        TICKER=$(xdo id -a "Ticker")
+        if [ -x $TICKER ]; then
+            (alacritty -t "Ticker" -e securities_scroll &)
+        fi
+        return
+    fi
+
+    TICKRS=$(xdo id -a "Tickrs")
+    if [[ -z $TICKRS ]]; then
+        alacritty --hold -t "Tickrs" -e tickrs --hide-help --show-volumes --hide-toggle -s "$SELECTED" &
+        sleep 0.8
+        TICKRS=$(xdo id -a "Tickrs")
+        while [[ -z $TICKRS ]]; do
+            sleep 0.8
+            TICKRS=$(xdo id -a "Tickrs")
+        done
+    fi
+    xdotool type --window "$TICKRS" "/$SELECTED"
+    xdotool key --window "$TICKRS" Return
+}
+
+get_news_window
+get_tickrs_window
+
+sleep 0.3
+
+xdotool type --window $NEWS ":$SELECTED"
+xdotool key --window $NEWS Return
+
+xdotool mousemove --window $NEWS 0 0 
+xdotool click 1
+
+IFS=$Field_Separator

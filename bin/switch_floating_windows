@@ -1,0 +1,21 @@
+#!/bin/bash
+
+next=$(bspc query -N -d focused -n next.local.leaf)
+prev=$(bspc query -N -d focused -n prev.local.leaf)
+
+echo $prev > ~/pp
+echo $next >> ~/pp
+
+if [[ $1 == "prev" ]]; then        
+    go_to=$prev
+else        
+    go_to=$next
+fi
+
+bspc node -f $go_to
+bspc node -a $go_to
+bspc node $go_to -l above
+not_focused=$(bspc query -N -d focused -n .\!focused.leaf)
+for node in $not_focused; do
+    bspc node $node -l below
+done

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+wal -i /home/jp/Pictures/Wallpapers/ \
+    --iterative -nq -o "/home/jp/bin/setColorsVar"
+feh --bg-fill --no-xinerama  "$(< "/home/jp/.cache/wal/wal")"
+
+pywal-discord
+# source the colors.
+. "/home/jp/.cache/wal/colors.sh"
+
+# Set the border colors.
+bspc config normal_border_color "$color0"
+bspc config active_border_color "$color3"
+bspc config focused_border_color "$color6"
+bspc config presel_feedback_color "$color1"
+
+keyboard_color=$color6
+# polychromatic-cli -s PM1742F17801642 -o reactive -p vslow -c "$keyboard_color"
+polychromatic-cli -s PM1742F17801642 -o static -c "$keyboard_color"
+

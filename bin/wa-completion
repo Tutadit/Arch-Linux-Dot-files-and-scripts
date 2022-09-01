@@ -1,0 +1,30 @@
+WEBAPP_DIR="/home/jp/.local/share/webapp"
+WEBAPPS_FILE="${WEBAPP_DIR}/webapps"
+WEBAPPS_HISTORY="${WEBAPP_DIR}/history"
+
+history_oneword=$(cat $WEBAPPS_HISTORY | grep -v " ")
+history_multiword=$(cat $WEBAPPS_HISTORY | grep " ")
+
+_get_commands() {
+    names=$(cat $WEBAPPS_FILE | cut -d' ' -f1 | tr '\n' ' ')
+    echo "new list delete $names $history_oneword"
+}
+
+_wa() {
+    local cur first wordlist
+
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    first="${COMP_WORDS[1]}"
+
+    echo $first >> /home/jp/hola
+    case "${first}" in
+        *)
+        wordlist=$(_get_commands)
+        ;;
+    esac
+
+    COMPREPLY=($(compgen -W "${wordlist}" -- "${cur}"))
+}
+
+complete -F _wa wa

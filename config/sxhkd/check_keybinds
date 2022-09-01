@@ -1,0 +1,44 @@
+#!/bin/bash
+
+KEYBINDS=$( sed '/\(^[\t#].*\)\|\(^$\)/d' ./sxhkdrc | tr -d "[:blank:]")
+
+CONTROL=false
+ALT=false
+SUPER=false
+
+for arg in $@; do
+    case $arg in
+        -c)
+            CONTROL=true
+        ;;
+        -a)
+            ALT=true
+        ;;
+        -s)
+            SUPER=true
+        ;;
+    esac
+done
+
+FOUND_KEYBINDS=""
+for keybind in $KEYBINDS; do
+    if [[ "$keybind" = *"ctrl"* ]]; then
+        if [ $CONTROL ]; then
+            FOUND_KEYBINDS="$FOUND_KEYBINDS $keybind"
+        fi
+    fi
+    if [[ "$keybind" = *"alt"* ]]; then
+        if [ $ALT ]; then
+            FOUND_KEYBINDS="$FOUND_KEYBINDS $keybind"
+        fi
+    fi
+    if [[ "$keybind" = *"super"* ]]; then
+        if [ $SUPER ]; then            
+            FOUND_KEYBINDS="$FOUND_KEYBINDS $keybind"
+        fi
+    fi
+done
+
+for keybind in $FOUND_KEYBINDS; do
+    echo $keybind
+done

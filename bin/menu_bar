@@ -1,0 +1,274 @@
+#!/bin/bash
+
+source /home/jp/.local/share/icons-in-terminal/icons_bash.sh
+
+PANEL_WM_NAME="bspwm_panel"
+PANEL_FONT="Roboto:style=Bold:size=10"
+
+clear_pipe() {
+    rm -f /tmp/slick.menu
+}
+
+echo "Clearing pipe"
+clear_pipe
+
+if xdo id -a "$PANEL_WM_NAME" >/dev/null; then
+    printf "%s\n" "The panel is already running." >&2
+    printf "%s\n" "Bye ;)"
+    exit
+fi
+
+keyboard() {
+    INFO=$(xset q)
+
+    CAPS="${INFO:124:3}"
+    NUM="${INFO:148:3}"
+
+    if [[ "$CAPS" != on* ]] && [[ "$NUM" != on* ]]; then
+        return
+    fi
+
+    echo -ne "%{l}    "
+
+    if [[ "$CAPS" == on* ]]; then
+        echo -ne "$md_keyboard_capslock"
+    fi
+
+    if [[ "$NUM" == on* ]]; then
+        echo -ne " N "
+    fi
+}
+
+display() {
+    date="$(date '+%R')"
+    echo -ne "%{r}$date    "
+}
+
+timetrack() {
+    find_key="Tracking"
+    tracking=$(timew | grep $find_key)
+
+    if [[ -z $tracking ]]; then
+        return 
+    fi
+
+    echo -ne "%{l}    "
+    tracking=${tracking#"$find_key"}
+    time_tracked=$(timew | grep Total | grep -oP "\\d+:\d+:\d+")
+    echo -ne "$md_timer: $tracking $time_tracked"
+        
+}
+
+ws() {
+    if [ "$1" = "all" ]; then
+        DESKTOPS="I II III IV V VI VII VIII IX X"
+    elif [ "$1" = "HDMI-A-0" ]; then
+        DESKTOPS="VI VII VIII IX X"
+    elif [ "$1" = "DisplayPort-2" ]; then
+        DESKTOPS="XI XII XIII XIV XV"
+    elif [ "$1" = "DVI-D-0" ]; then
+        DESKTOPS="I II III IV V"
+    fi
+
+    echo -ne " %{c}"
+    STATUS=$(bspc wm -g)
+
+    for desktop in $DESKTOPS; do
+        if [[ "$STATUS" =~ .*:[OFU]$desktop:.* ]]; then
+            echo -ne "%{F$color9}"
+        fi
+
+        WINDOWS=$(bspc query -N -d "$desktop")
+        NUM_OF_WINDOWS=$(wc -l <<<"$WINDOWS")
+
+        if [ -z "$WINDOWS" ]; then
+            echo -ne "$fa_square_o  "
+        elif [ $NUM_OF_WINDOWS = "1" ]; then
+            WINDOW_TITLE=$(xdotool getwindowname "$WINDOWS")
+            case "$WINDOW_TITLE" in
+            *[sS]lack*)
+                echo -ne "$fa_slack "
+            ;;
+            *[Ww]hiteboard*)
+                echo -ne "$fa_pencil  "
+                ;;
+            *[iI][Cc]loud*)
+                echo -ne "$fa_cloud  "
+                ;;
+            *[oO]utlook*)
+                echo -ne "$md_mail  "
+                ;;
+            *W3M*)
+                echo -ne "$fa_globe  "
+                ;;
+            Alacritty)
+                echo -ne "$fa_terminal  "
+                ;;
+            *Code*)
+                echo -ne "$fa_codepen  "
+                ;;
+            *[Gg]ravit*[dD]esigner*)
+                echo -ne "$fa_pencil  "
+                ;;
+            *[Ff]irefox*)
+                echo -ne "$fa_firefox  "
+                ;;
+            *[Dd]iscord*)
+                echo -ne "$md_message  "
+                ;;
+            *[Ss]potify*)
+                echo -ne "$fa_spotify "
+                ;;
+
+            *)
+
+                echo -ne "$fa_square  "
+                ;;
+            esac
+        else
+            fluentReader=false
+            tickrs=false
+            alacritty=false
+            code=false
+            w3m=false
+            timelord=false
+
+            for window in $WINDOWS; do
+                WINDOW_NAME=$(xdotool getwindowname $window 2>/dev/null)
+                if [ -z "$WINDOW_NAME" ]; then
+                    continue
+                fi
+
+                case $WINDOW_NAME in
+                *Timelord*)
+                    timelord=true
+                    ;;
+                *W3M*)
+                    w3m=true
+                    ;;
+                *NewsByJP*)
+                    fluentReader=true
+                    ;;
+                *[tT]ickrs*)
+                    tickrs=true
+                    ;;
+                *[Aa]lacritty*)
+                    alacritty=true
+                    ;;
+                *[Cc]ode*)
+                    code=true
+                    ;;
+                esac
+            done
+
+            if [ $fluentReader = true ] && [ $tickrs = true ]; then
+                echo -ne "$fa_money  "
+            elif [ $alacritty = true ] && [ $code = true ]; then
+                echo -ne "$md_developer_board  "
+            elif [ $timelord = true ]; then
+                echo -ne "$fa_calendar  "
+            elif [ $w3m = true ]; then
+                echo -ne "$fa_globe  "
+            elif [ $code = true ]; then
+                echo -ne "$md_developer_mode  "
+            elif [ $alacritty = true ]; then
+                echo -ne "$file_terminal  "
+            else
+                echo -ne "$fa_th_large  "
+            fi
+        fi
+
+        if [[ "$STATUS" =~ .*:[OFU]$desktop:.* ]]; then
+            echo -ne "%{F$color7}"
+        fi
+    done
+}
+
+music() {
+
+    
+
+    if playerctl metadata > /dev/null 2>&1; then
+        INFO=$(playerctl metadata)
+
+        TITLE=$(sed '9q;d' <<<"$INFO")
+        TITLE="${TITLE:34}"
+        ARTIST=$(sed '6q;d' <<<"$INFO")
+        ARTIST="${ARTIST:34}"
+
+        echo -ne "%{r}    "
+
+        STATUS=$(playerctl status)
+        if [ "$STATUS" = "Playing" ]; then
+            echo -ne "%{F#1DB954}$fa_spotify%{F$color7}"
+        else
+            echo -ne "$fa_spotify"
+        fi
+
+        echo -ne "  $TITLE - $ARTIST            "
+
+    fi
+
+}
+
+battery() {
+    status=$(cat /sys/class/power_supply/BAT0/status)
+    capacity=$(cat /sys/class/power_supply/BAT0/capacity)
+
+    echo -ne "%{l}    "
+    if [ $status != "Discharging" ]; then
+        echo -ne "$fa_bolt  "
+    fi
+
+    if [ $capacity -gt 90 ]; then 
+        echo -ne "$fa_battery "
+    elif [ $capacity -gt 80 ]; then
+        echo -ne "$fa_battery_3 "
+    elif [ $capacity -gt 50 ]; then
+        echo -ne "$fa_battery_2 "
+    elif [ $capacity -gt 20 ]; then
+        echo -ne "$fa_battery_1 "
+    else
+        echo -ne "$fa_battery_0 "
+    fi
+    
+    echo -ne "$capacity"
+
+}
+
+NUM_OF_DESKTOPS=$(xrandr | awk '$2 == "connected"{print $1}' | wc -l)
+
+Monitors="DVI-D-0 HDMI-A-0 DisplayPort-2"
+ulimit -s 65536
+
+mkfifo /tmp/slick.menu
+
+while true; do
+    source /home/jp/.cache/wal/colors.var.sh
+
+    echo -ne "%{F$color7}"
+    echo -ne "%{B$color0}"
+    tmp=0
+    if [ $NUM_OF_DESKTOPS -gt 1 ]; then
+        for m in $Monitors; do
+            echo -ne "%{S${tmp}}"
+            if [[ $tmp == 1 ]]; then
+                echo -ne "$(keyboard)"
+                echo -ne "$(display)"
+            else
+                echo -ne "$(timetrack)"
+                echo -ne "$(music)"
+            fi
+            echo -ne "$(ws $m)"
+            let tmp=$tmp+1
+        done
+    else
+        echo -ne "$(battery)"
+        echo -ne "$(display)"
+        echo -ne "$(ws all)"
+    fi
+    echo -ne "\n"
+    sleep 0.2
+done >/tmp/slick.menu &
+
+cat </tmp/slick.menu | lemonbar -g x45 -u 0 -f "$PANEL_FONT" -n "$PANEL_WM_NAME" -f "icons\-in\-terminal" &

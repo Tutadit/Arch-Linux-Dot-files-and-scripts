@@ -1,0 +1,18 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: addStock <command>"
+    echo
+    echo "Commands available:"
+    echo -e "\tnew"
+    echo -e "\tedit"
+}
+
+case $1 in
+    *)
+        usage
+    ;;
+esac
+
+
+

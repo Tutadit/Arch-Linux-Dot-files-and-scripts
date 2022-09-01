@@ -1,0 +1,22 @@
+#!/bin/bash
+
+tiled_windows=$(bspc query -N -d -n .tiled.leaf)
+floating_windows=$(bspc query -N -d -n .floating.leaf)
+
+if [[ $tiled_windows == "" ]]; then    
+    for node_id in $floating_windows; do
+        bspc node $node_id -t tiled
+    done
+else 
+    for node_id in $tiled_windows; do
+        bspc node $node_id -t floating
+    done
+    bspc node -l above
+fi
+
+parents=$(bspc query -N -d focused -n .ancestor_of)
+
+for parent in $parents; do
+    bspc node $parent -B
+    bspc node $parent -E
+done

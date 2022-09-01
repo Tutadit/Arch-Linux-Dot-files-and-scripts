@@ -1,0 +1,51 @@
+#!/bin/bash
+
+THE_NAME="CustomOverlay"
+
+echo "Running $THE_NAME"
+
+if xdo id -a "$THE_NAME" > /dev/null; then
+    printf "%s\n" "The panel is already running." >&2
+    printf "%s\n" "Bye ;)"      
+    exit 
+fi
+
+while [ true ] ; do    
+    echo ""
+    sleep 0.9
+done | lemonbar -g 1920x1080+1920 -B "#77000000" -n "$THE_NAME" &
+
+if [[ $1 == "--id" ]]; then
+    FOCUS_WINDOW=$2
+elif [[ $1 == '--name' ]]; then
+    while [ true ] ; do
+        FOCUS_WINDOW=$(xdo id -a "$2") 
+        if [ -z "$FOCUS_WINDOW" ]; then
+            continue
+        fi
+        break
+    done
+fi
+
+while [ true ] ; do
+    SELF_WINDOW=$(xdo id -a "$THE_NAME")    
+    if [ -z "$SELF_WINDOW" ]; then
+        continue
+    fi
+    break
+done
+
+PID_SELF=$(xdo pid -n "$THE_NAME")
+PID_FOCUS=$(xdo pid "$FOCUS_WINDOW")
+
+if [ ! -z $PID_SELF ]; then
+    ps -q $PID_SELF -o comm=
+fi
+
+if [ ! -z $PID_FOCUS ]; then
+    ps -q $PID_FOCUS -o comm=
+fi
+
+xdo below -t $FOCUS_WINDOW $SELF_WINDOW
+
+echo "xdo below -t $FOCUS_WINDOW $SELF_WINDOW"

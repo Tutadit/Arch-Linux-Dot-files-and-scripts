@@ -1,0 +1,158 @@
+#!/bin/bash
+
+WEBAPP_DIR="/home/jp/.local/share/webapp"
+PROFILES_DIR="${WEBAPP_DIR}/profiles"
+WEBAPPS_FILE="${WEBAPP_DIR}/webapps"
+WEBAPPS_HISTORY="${WEBAPP_DIR}/history"
+WEBAPPS_PRESETS="${WEBAPP_DIR}/presets"
+
+setup() {
+    if [ ! -d $PROFILES_DIR ]; then
+        mkdir -p $PROFILES_DIR
+    fi
+
+    if [ ! -f $WEBAPPS_FILE ]; then
+        touch $WEBAPPS_FILE
+    fi
+
+    if [ ! -f $WEBAPPS_HISTORY ]; then
+        touch $WEBAPPS_HISTORY
+    fi
+}
+
+list_webapps() {
+    cat $WEBAPPS_FILE | while read webapp; do
+        echo $webapp
+    done
+}
+
+remove_webapp() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: wa delete <name>"
+        return
+    fi
+
+    name_to_remove=$1
+    new_webapps=$(cat $WEBAPPS_FILE | grep -Ev "^$name_to_remove")
+    echo -e "$new_webapps" >$WEBAPPS_FILE
+    rm -fr "$PROFILES_DIR/$name_to_remove"
+}
+
+add_webapp() {
+    if [[ $# -ne 2 ]]; then
+        echo "Usage: wa new <name> <URL>"
+        return
+    fi
+
+    webapp_name=$1
+    webapp_url=$2
+
+    echo -e "$webapp_name $webapp_url" >>$WEBAPPS_FILE
+
+    webapp_profile_dir="$PROFILES_DIR/$webapp_name"
+
+    if [ ! -d "$webapp_profile_dir" ]; then
+        mkdir -p "$webapp_profile_dir/chrome"
+        cp "$WEBAPPS_PRESETS/prefs.js" "$webapp_profile_dir/prefs.js"
+        cp "$WEBAPPS_PRESETS/userChrome.css" "$webapp_profile_dir/chrome/userChrome.css"
+    fi
+}
+
+launch() {
+    if [ -z $1 ]; then
+        return
+    fi
+
+    (eval \\$@ >/dev/null 2>&1) &
+    disown
+}
+
+regex_url='^((http[s]?|ftp):\/\/)?\/?([^\/\.]+\.)*?(([^\/\.]+)\.[^:\/\s\.]{2,3}(\.[^:\/\s\.]{2,3})?)(:[0-9]+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$'
+regex_localhost='^(http[s]?:\/\/)?(localhost|([0-9]+)(\.[0-9]+)*)(:[0-9]+)?(\/.*)?$'
+
+clear_history() {
+    echo "" >$WEBAPPS_HISTORY
+}
+
+launch_webapp() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: wa <name>"
+        return
+    fi
+
+    query=$@
+    in_history=$(cat $WEBAPPS_HISTORY | grep "$query")
+    if [[ $in_history == "" ]]; then
+        echo -ne "$query\n" >>$WEBAPPS_HISTORY
+    else             
+        gawk -i inplace "!/$query/" $WEBAPPS_HISTORY        
+        echo -ne "$query\n" >> $WEBAPPS_HISTORY
+    fi
+    webapp_name=${1%% *}
+    webapp_data=$(cat $WEBAPPS_FILE | grep -e "^$webapp_name ")
+    if [[ -z $webapp_data ]]; then
+        if [[ $webapp_name =~ $regex_url ]]; then            
+            webapp_name="${BASH_REMATCH[5]}"            
+            webapp_data=$(cat $WEBAPPS_FILE | grep -e "^$webapp_name")
+            if [[ -z $webapp_data ]]; then
+                webapp_url="${BASH_REMATCH[4]}"
+                add_webapp $webapp_name $webapp_url
+                webapp_url=${1%% *}
+                webapp_profile_dir="$PROFILES_DIR/$webapp_name"
+            else
+                webapp_url=${1%% *}
+                webapp_name=$(echo $webapp_data | awk '{print $1;}')
+                webapp_profile_dir="$PROFILES_DIR/$webapp_name"
+            fi
+        else
+            if [[ $webapp_name =~ $regex_localhost ]]; then
+                webapp_url=${1%% *}
+                webapp_name="localhost"
+                webapp_profile_dir="$PROFILES_DIR/localhost"
+            else
+                webapp_url="http://www.google.com/search?q="
+                query=$(sed 's/ /+/g' <<<"$@")
+                webapp_url="${webapp_url}${query}"
+                webapp_profile_dir="$PROFILES_DIR/google"
+                webapp_name="google"
+            fi
+        fi
+    else
+        webapp_name=$(echo $webapp_data | awk '{print $1;}')
+        webapp_url=$(echo $webapp_data | awk 'NF>1{print $NF}')
+        webapp_profile_dir="$PROFILES_DIR/$webapp_name"
+    fi
+    launch firefox --profile "$webapp_profile_dir" --class "wa:$webapp_name" $webapp_url
+}
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage: wa <command> <command-attributes>"
+    echo -e "\nCommands:"
+    echo -e "new\tAdd new app"
+    echo -e "list\tList apps"
+    echo -e "delete\tDelete app"
+fi
+
+setup
+webapps=$(cat $WEBAPPS_FILE)
+command=$1
+case $command in
+new)
+    shift
+    add_webapp $@
+    ;;
+list | ls)
+    shift
+    list_webapps $@
+    ;;
+del | delete)
+    shift
+    remove_webapp $@
+    ;;
+clear)
+    clear_history
+    ;;
+*)
+    launch_webapp $@
+    ;;
+esac

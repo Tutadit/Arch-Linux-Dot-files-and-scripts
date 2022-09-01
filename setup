@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cp -rf config/* ~/.config/
+cp -f bashrc ~/.bashrc
+cp -rf bin/* ~/.local/bin/
+cp -f launch_apps ~/.launch_apps
+cp -rf share/* ~/.local/share/

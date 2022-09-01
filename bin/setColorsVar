@@ -1,0 +1,25 @@
+#!/bin/bash
+
+source /home/jp/.cache/wal/colors.sh
+
+rm -f /home/jp/.cache/wal/colors.var.sh
+touch /home/jp/.cache/wal/colors.var.sh
+
+echo "#!/bin/bash" >> /home/jp/.cache/wal/colors.var.sh
+echo "" >> /home/jp/.cache/wal/colors.var.sh
+echo "color0=$color0" >> /home/jp/.cache/wal/colors.var.sh
+echo "color1=$color1" >> /home/jp/.cache/wal/colors.var.sh
+echo "color2=$color2" >> /home/jp/.cache/wal/colors.var.sh
+echo "color3=$color3" >> /home/jp/.cache/wal/colors.var.sh
+echo "color4=$color4" >> /home/jp/.cache/wal/colors.var.sh
+echo "color5=$color5" >> /home/jp/.cache/wal/colors.var.sh
+echo "color6=$color6" >> /home/jp/.cache/wal/colors.var.sh
+echo "color7=$color7" >> /home/jp/.cache/wal/colors.var.sh
+echo "color8=$color8" >> /home/jp/.cache/wal/colors.var.sh
+echo "color9=$color9" >> /home/jp/.cache/wal/colors.var.sh
+echo "color10=$color10" >> /home/jp/.cache/wal/colors.var.sh
+echo "color11=$color11" >> /home/jp/.cache/wal/colors.var.sh
+echo "color12=$color12" >> /home/jp/.cache/wal/colors.var.sh
+echo "color13=$color13" >> /home/jp/.cache/wal/colors.var.sh
+echo "color14=$color14" >> /home/jp/.cache/wal/colors.var.sh
+echo "color15=$color15" >> /home/jp/.cache/wal/colors.var.sh 

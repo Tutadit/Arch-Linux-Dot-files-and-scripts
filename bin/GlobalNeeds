@@ -1,0 +1,11 @@
+#!/bin/bash
+
+##
+#
+# Various Locations and Config options
+#
+##
+WALLPAPER_DIR=/home/jp/Pictures/Wallpapers
+PALETTE_DIR=/home/jp/Pictures/Wallpapers/Palettes
+TERMITE_CONFIG=/home/jp/.config/termite/config
+FIREFOX_THEME=/home/jp/.config/colors/firefox_theme.json

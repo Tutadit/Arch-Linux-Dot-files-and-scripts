@@ -1,0 +1,76 @@
+#!/bin/bash
+
+WINDOW=$(xdotool search --name "FloatingShell")
+HIDDEN=$(xdotool search --name "FloatingShellHidden")
+BIG=$(xdotool search --name "FloatingShellBig")
+CURRENT="FloatingShell"
+
+echo "Run Menu"
+if [ -z "$WINDOW" ]; then
+    echo "Starting Floating Shell with overlay"
+    alacritty -t FloatingShell -o window.opacity=0.9
+fi
+
+echo "looking for window"
+MAX_TRIES=10
+TRIES=0
+while [ -z "$WINDOW" ]; do
+    WINDOW=$(xdotool search --name "FloatingShell")
+    TRIES=`expr $TRIES + 1`
+    if [[ $TRIES -gt MAX_TRIES ]]; then
+        break
+    fi
+done;
+
+if [ -z "$WINDOW" ]; then
+    echo "Window not found"
+    exit
+fi
+
+if [[ "$1" == "--size" ]]; then
+
+    if [ ! -z "$HIDDEN" ]; then
+        echo "Making it visible"
+        xdotool windowmap --sync $WINDOW
+    fi
+
+    echo "Focusing window 2"
+    xdotool windowfocus --sync $WINDOW    
+
+    if [ -z "$BIG" ]; then    
+        echo "Making large"
+        xdotool windowmove --relative $WINDOW 0 -460       
+        xdotool windowsize $WINDOW 1920 540        
+        xdotool set_window --name "FloatingShellBig" $WINDOW
+        overlay --name "FloatingShellBig"
+    else
+        echo "Making small"
+        xdotool windowsize $WINDOW 1920 80
+        xdotool windowmove --relative $WINDOW 0 +460
+        xdotool set_window --name "FloatingShell" $WINDOW
+        overlay --name "FloatingShell"
+    fi
+    exit
+fi
+
+if [[ -z $HIDDEN ]]; then
+    echo "hiding"
+    pkill overlay
+    xdotool windowunmap --sync $WINDOW
+    xdotool set_window --name "FloatingShellHidden" $WINDOW
+    exit
+fi
+
+echo "Focusing once again"
+echo "$WINDOW"
+xdotool windowmap --sync $WINDOW
+echo "2"
+xdotool windowfocus --sync $WINDOW
+echo "3"
+desktop=$(xdotool get_desktop_for_window $WINDOW)
+echo "4"
+xdotool set_desktop $desktop
+echo "5"
+xdotool set_window --name "FloatingShell" $WINDOW
+echo "6"
+overlay --name "FloatingShell"
