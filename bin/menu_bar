@@ -44,6 +44,7 @@ display() {
     echo -ne "%{r}$date    "
 }
 
+
 timetrack() {
     find_key="Tracking"
     tracking=$(timew | grep $find_key)
@@ -75,7 +76,7 @@ ws() {
 
     for desktop in $DESKTOPS; do
         if [[ "$STATUS" =~ .*:[OFU]$desktop:.* ]]; then
-            echo -ne "%{F$color9}"
+            echo -ne "%{F$color6}"
         fi
 
         WINDOWS=$(bspc query -N -d "$desktop")

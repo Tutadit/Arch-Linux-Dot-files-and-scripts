@@ -8,7 +8,7 @@ title=$(xdotool getwindowname $wid)
 
 case "$instance.$class.$title" in
 *[Mm]inecraft*)
-	echo "desktop = ^3"
+	echo "desktop = ^6"
 	echo "state = tiled"
 ;;
 *[Oo]pening*)
@@ -31,7 +31,7 @@ case "$instance.$class.$title" in
 ;;
 *wa:google*)
 	echo "state = floating"
-	echo "desktop = ^11"
+	echo "desktop = ^1"
 	echo "rectangle = 1866x981+27+72"
 	echo "follow = on"	
 	echo "manage = on"

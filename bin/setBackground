@@ -1,7 +1,7 @@
 #!/bin/bash
 
 wal -i /home/jp/Pictures/Wallpapers/ \
-    --iterative -nq -o "/home/jp/bin/setColorsVar"
+    --iterative -nqo setColorsVar
 feh --bg-fill --no-xinerama  "$(< "/home/jp/.cache/wal/wal")"
 
 pywal-discord
