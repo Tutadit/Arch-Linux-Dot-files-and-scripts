@@ -14,6 +14,12 @@ alias cp='cp -i'                    # Prompt if a copy causes an override
 alias pacman='pacman --color auto'
 alias sudo='sudo '
 alias sail='./vendor/bin/sail'
+alias chat='wa chat.openai.com'
+
+
+alias appScript='wa https://www.google.com/script/start/'
+
+EDITOR=/usr/bin/emacs
 
 hide_floating_shell() {
 	WINDOW_TITLE=$(xdotool getwindowfocus getwindowname)
@@ -59,7 +65,7 @@ XDG_DATA_DIR=/home/jp/.data
 XDG_CONFIG_DIR=/home/jp/.config
 
 #Set up user bin
-PATH=/home/jp/.local/bin:$PATH
+PATH=/home/jp/.local/bin:/home/jp/.local/share/Android/Sdk/tools/bin/:$PATH
 
 export XDG_CONFIG_HOME
 export PATH

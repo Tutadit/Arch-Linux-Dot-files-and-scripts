@@ -122,7 +122,8 @@ launch_webapp() {
         webapp_url=$(echo $webapp_data | awk 'NF>1{print $NF}')
         webapp_profile_dir="$PROFILES_DIR/$webapp_name"
     fi
-    launch firefox --profile "$webapp_profile_dir" --class "wa:$webapp_name" $webapp_url
+    firefox --profile "$webapp_profile_dir" --class "wa:$webapp_name" $webapp_url &
+    echo $! >> $PROFILES_DIR/$webapp_name/pid
 }
 
 if [[ $# -eq 0 ]]; then

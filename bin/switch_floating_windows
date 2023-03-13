@@ -3,9 +3,6 @@
 next=$(bspc query -N -d focused -n next.local.leaf)
 prev=$(bspc query -N -d focused -n prev.local.leaf)
 
-echo $prev > ~/pp
-echo $next >> ~/pp
-
 if [[ $1 == "prev" ]]; then        
     go_to=$prev
 else        

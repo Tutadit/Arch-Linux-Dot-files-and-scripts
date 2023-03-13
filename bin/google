@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+IDS=$(xdo id -N wa:google)
+while [ -z $IDS ]; do    
+    wa google.com &>/dev/null
+    sleep 1  
+    IDS=$(xdo id -N wa:google)
+done
+
+for ID in $IDS; do
+    MAP_STATE=$(xwininfo -id $ID | grep 'Map State')
+    echo $MAP_STATE
+    echo $ID
+    if [[ $MAP_STATE == *"IsUnMapped"* ]]; then        
+        bspc node $ID -g hidden=off
+        bspc node $ID -d focused
+        bspc node $ID -f
+        bspc node $ID -a
+    else
+        bspc node $ID -g hidden=on    
+    fi
+done

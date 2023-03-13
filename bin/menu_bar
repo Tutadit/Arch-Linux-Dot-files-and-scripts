@@ -79,7 +79,7 @@ ws() {
             echo -ne "%{F$color6}"
         fi
 
-        WINDOWS=$(bspc query -N -d "$desktop")
+        WINDOWS=$(bspc query -N -d "$desktop" -n .\!hidden)
         NUM_OF_WINDOWS=$(wc -l <<<"$WINDOWS")
 
         if [ -z "$WINDOWS" ]; then
@@ -186,9 +186,6 @@ ws() {
 }
 
 music() {
-
-    
-
     if playerctl metadata > /dev/null 2>&1; then
         INFO=$(playerctl metadata)
 
@@ -244,7 +241,15 @@ ulimit -s 65536
 
 mkfifo /tmp/slick.menu
 
-while true; do
+RUN=true
+
+function cleanup() {
+    RUN=false
+}
+
+trap cleanup EXIT
+
+while $RUN; do
     source /home/jp/.cache/wal/colors.var.sh
 
     echo -ne "%{F$color7}"
