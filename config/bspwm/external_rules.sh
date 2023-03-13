@@ -7,6 +7,13 @@ instance=$3
 title=$(xdotool getwindowname $wid)
 
 case "$instance.$class.$title" in
+*wa:google*)
+	echo "state = floating"	
+	echo "rectangle = 1920x1040+0+40"	
+	echo "border = off"
+	echo "sticky = on"
+	echo "layer = above"	
+;;
 *[Mm]inecraft*)
 	echo "desktop = ^6"
 	echo "state = tiled"
@@ -28,13 +35,6 @@ case "$instance.$class.$title" in
 *wa:outlook*)
 	echo "state = pseudo_tiled"
 	echo "desktop = ^8"
-;;
-*wa:google*)
-	echo "state = floating"
-	echo "desktop = ^1"
-	echo "rectangle = 1866x981+27+72"
-	echo "follow = on"	
-	echo "manage = on"
 ;;
 *wa:*)
 	echo "state = floating"
@@ -104,11 +104,10 @@ case "$instance.$class.$title" in
 	echo "desktop = any.focused"
 	;;
 *[Cc]ode*)
-	echo "state = tiled"
-	echo "desktop = ^6"
+	echo "state = tiled"	
 	;;
 *.[Aa]lacritty*)
-	echo "state = pseudo_tiled"
+	echo "state = tiled"
 	;;
 *[Ss]potify*)
 	echo "state = floating"

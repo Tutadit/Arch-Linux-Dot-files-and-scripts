@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+ID=$(xdo id -N wa:openai | head -n1)
+while [ -z $ID ]; do
+    echo "Starting Chat GPT"
+    wa chat.openai.com &>/dev/null
+    sleep 1  
+    ID=$(xdo id -N wa:openai | head -n1)
+done
+
+MAP_STATE=$(xwininfo -id $ID | grep 'Map State')
+echo $MAP_STATE
+echo $ID
+if [[ $MAP_STATE == *"IsUnMapped"* ]]; then        
+    bspc node $ID -g hidden=off
+    bspc node $ID -d focused
+    bspc node $ID -f
+    bspc node $ID -a
+else
+    bspc node $ID -g hidden=on    
+fi

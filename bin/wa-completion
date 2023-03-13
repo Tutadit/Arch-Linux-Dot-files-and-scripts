@@ -17,7 +17,6 @@ _wa() {
     cur="${COMP_WORDS[COMP_CWORD]}"
     first="${COMP_WORDS[1]}"
 
-    echo $first >> /home/jp/hola
     case "${first}" in
         *)
         wordlist=$(_get_commands)
