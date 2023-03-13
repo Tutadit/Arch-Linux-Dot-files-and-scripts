@@ -64,9 +64,9 @@ ws() {
     if [ "$1" = "all" ]; then
         DESKTOPS="I II III IV V VI VII VIII IX X"
     elif [ "$1" = "HDMI-A-0" ]; then
-        DESKTOPS="VI VII VIII IX X"
+        DESKTOPS="I II III IV V VI VII VIII IX X"
     elif [ "$1" = "DisplayPort-2" ]; then
-        DESKTOPS="XI XII XIII XIV XV"
+        DESKTOPS="XI XII XIII XIV XV XVI XVII XVIII XIX XX "
     elif [ "$1" = "DVI-D-0" ]; then
         DESKTOPS="I II III IV V"
     fi
@@ -239,7 +239,7 @@ battery() {
 
 NUM_OF_DESKTOPS=$(xrandr | awk '$2 == "connected"{print $1}' | wc -l)
 
-Monitors="DVI-D-0 HDMI-A-0 DisplayPort-2"
+Monitors="HDMI-A-0 DisplayPort-2"
 ulimit -s 65536
 
 mkfifo /tmp/slick.menu
