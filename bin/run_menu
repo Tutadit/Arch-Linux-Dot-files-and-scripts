@@ -8,7 +8,7 @@ CURRENT="FloatingShell"
 echo "Run Menu"
 if [ -z "$WINDOW" ]; then
     echo "Starting Floating Shell with overlay"
-    alacritty -t FloatingShell -o window.opacity=0.9
+    alacritty --class FloatingShell -t FloatingShell -o window.opacity=0.9
 fi
 
 echo "looking for window"
@@ -41,13 +41,13 @@ if [[ "$1" == "--size" ]]; then
         echo "Making large"
         xdotool windowmove --relative $WINDOW 0 -460       
         xdotool windowsize $WINDOW 1920 540        
-        xdotool set_window --name "FloatingShellBig" $WINDOW
+        xdotool set_window --name "FloatingShellBig" --class "FloatingShellBig" $WINDOW
         overlay --name "FloatingShellBig"
     else
         echo "Making small"
         xdotool windowsize $WINDOW 1920 80
         xdotool windowmove --relative $WINDOW 0 +460
-        xdotool set_window --name "FloatingShell" $WINDOW
+        xdotool set_window --name "FloatingShell" --class "FloatingShell" $WINDOW
         overlay --name "FloatingShell"
     fi
     exit
@@ -57,20 +57,15 @@ if [[ -z $HIDDEN ]]; then
     echo "hiding"
     pkill overlay
     xdotool windowunmap --sync $WINDOW
-    xdotool set_window --name "FloatingShellHidden" $WINDOW
+    xdotool set_window --name "FloatingShellHidden" --class "FloatingShellHidden" $WINDOW
     exit
 fi
 
 echo "Focusing once again"
 echo "$WINDOW"
 xdotool windowmap --sync $WINDOW
-echo "2"
 xdotool windowfocus --sync $WINDOW
-echo "3"
 desktop=$(xdotool get_desktop_for_window $WINDOW)
-echo "4"
 xdotool set_desktop $desktop
-echo "5"
 xdotool set_window --name "FloatingShell" $WINDOW
-echo "6"
 overlay --name "FloatingShell"
