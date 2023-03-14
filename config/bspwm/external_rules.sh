@@ -7,6 +7,9 @@ instance=$3
 title=$(xdotool getwindowname $wid)
 
 case "$instance.$class.$title" in
+*-studio)
+	echo "state = tiled"
+;;	
 *wa:google*)
 	echo "state = floating"	
 	echo "rectangle = 1920x1040+0+40"	

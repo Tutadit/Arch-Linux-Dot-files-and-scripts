@@ -58,20 +58,20 @@ if [[ $WINDOW_TITLE = "FloatingShell"* ]]; then
 fi
 
 #Setup X
-XDG_CONFIG_HOME=$HOME/.config
+export XDG_CONFIG_HOME=$HOME/.config
 
-XDG_CACHE_DIR=/home/jp/.cache
-XDG_DATA_DIR=/home/jp/.data
-XDG_CONFIG_DIR=/home/jp/.config
+export XDG_CACHE_DIR=/home/jp/.cache
+export XDG_DATA_DIR=/home/jp/.data
+export XDG_CONFIG_DIR=/home/jp/.config
 
 #Set up user bin
-PATH=/home/jp/.local/bin:/home/jp/.local/share/Android/Sdk/tools/bin/:$PATH
+export PATH=/home/jp/.local/bin:/home/jp/snap/flutter/common/flutter/bin:/home/jp/.local/share/Android/Sdk/tools/bin/:$PATH
 
-export XDG_CONFIG_HOME
-export PATH
+export CHROME_EXECUTABLE=/usr/bin/chromium
+export ANDROID_HOME=/home/jp/.local/share/Android/Sdk
 export TERM=xterm-256color
-export XDG_CACHE_DIR
-export XDG_DATA_DIR
+
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 
 #COLOR definitions
 
