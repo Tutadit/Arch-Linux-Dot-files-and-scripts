@@ -98,10 +98,12 @@ case "$instance.$class.$title" in
 	echo "state = floating"
 	echo "border = off"	
 	echo "rectangle = 1920x80+0+1000"	
+	echo "monitor = HDMI-A-0"
 	;;
 *CustomOverlay*)
 	echo "state = floating"
-	echo "border = off"		
+	echo "border = off"
+	echo "monitor = HDMI-A-0"
 	;;
 *[Cc]ode*)
 	echo "state = tiled"	

@@ -12,8 +12,8 @@ fi
 
 while [ true ] ; do    
     echo ""
-    sleep 50
-done | lemonbar -g 1920x1080+1920 -B "#77000000" -n "$THE_NAME" &
+    sleep 0.5
+done | lemonbar -g 1920x1080 -B "#77000000" -n "$THE_NAME" &
 
 if [[ $1 == "--id" ]]; then
     FOCUS_WINDOW=$2
