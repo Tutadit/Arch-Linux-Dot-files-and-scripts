@@ -2,6 +2,8 @@
 
 cp -rf config/* ~/.config/
 cp -f bashrc ~/.bashrc
+cp -f bash_profile ~/.bash_profile
+cp -f xinitrc ~/.xinitrx
 cp -rf bin/* ~/.local/bin/
 cp -f launch_apps ~/.launch_apps
 cp -rf share/* ~/.local/share/
