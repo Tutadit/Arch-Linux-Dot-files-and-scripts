@@ -11,7 +11,6 @@ alias emacs='emacs -nw'             # Disable emacs window
 alias rm='rm -i'                    # Promt before removing files
 alias mv='mv -i'                    # Prompt if a move causes an override
 alias cp='cp -i'                    # Prompt if a copy causes an override
-alias pacman='pacman --color auto'
 alias sudo='sudo '
 alias sail='./vendor/bin/sail'
 alias chat='wa chat.openai.com'
@@ -30,7 +29,7 @@ hide_floating_shell() {
 }
 
 if xhost >&/dev/null; then
-	WINDOW_TITLE=$(xdotool getwindowfocus getwindowname)	
+	WINDOW_TITLE=$(xdotool getwindowfocus getwindowname)		
 fi
 
 launch() {
@@ -46,6 +45,16 @@ launch() {
 	fi
 }
 
+webdev() {
+	 if [ -n $1 ]; then
+	    code $1
+	 fi
+
+	 wa laravel
+	 wa tailwindcss
+	 launch wa 10.0.0.70
+}
+
 launch_apps=$(cat ~/.launch_apps 2>/dev/null)
 
 if [[ $WINDOW_TITLE = "FloatingShell"* ]]; then
@@ -56,22 +65,6 @@ if [[ $WINDOW_TITLE = "FloatingShell"* ]]; then
 		alias $app="launch $app"
 	done	
 fi
-
-#Setup X
-export XDG_CONFIG_HOME=$HOME/.config
-
-export XDG_CACHE_DIR=/home/jp/.cache
-export XDG_DATA_DIR=/home/jp/.data
-export XDG_CONFIG_DIR=/home/jp/.config
-
-#Set up user bin
-export PATH=/home/jp/.local/bin:/home/jp/snap/flutter/common/flutter/bin:/home/jp/.local/share/Android/Sdk/tools/bin/:$PATH
-
-export CHROME_EXECUTABLE=/usr/bin/chromium
-export ANDROID_HOME=/home/jp/.local/share/Android/Sdk
-export TERM=xterm-256color
-
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 
 #COLOR definitions
 
@@ -89,9 +82,9 @@ RESET="\[$(tput sgr0)\]"
 number_of_jobs() {
 	jobs_total=$(jobs | wc -l)
 	if [ $jobs_total -gt 0 ]; then
-		echo -ne "\uf110" #Loading dots for background jobs
+		echo -ne "$fa_dot_circle_o" #Loading dots for background jobs
 	else
-		echo -ne "\uf1db" #Regular circle for no background jobs
+		echo -ne "$fa_circle_o" #Regular circle for no background jobs
 	fi
 
 }
@@ -127,8 +120,8 @@ set_colors() {
 
 set_bash_prompt() {
 	commOutput=$(echo $?)
-	ARROW=$(echo -ne "\uf101")
-	FOLDER=$(echo -ne "\uf114")
+	ARROW=$(echo -ne "$fa_angle_double_right")
+	FOLDER=$(echo -ne "$fa_folder_o")
 	PS1="$FOLDER \W \n$(error_handle $commOutput) $ARROW "
 }
 
