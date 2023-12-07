@@ -1,2 +1,3 @@
 #!/bin/bash
 complete -F _command launch
+complete -F _command webdev
