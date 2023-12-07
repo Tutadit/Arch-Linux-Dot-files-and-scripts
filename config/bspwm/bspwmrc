@@ -5,10 +5,10 @@ RES_WIDTH=1920
 NUM_OF_DESKTOPS=$(xrandr | awk '$2 == "connected"{print $1}' | wc -l)
 
 if [[ $NUM_OF_DESKTOPS -eq 2 ]]; then
-    xrandr --output HDMI-A-0 --mode 1920x1080 --primary --output DisplayPort-2 --mode 1920x1080 --right-of HDMI-A-0
+    xrandr --output HDMI-0 --mode 1920x1080 --primary --output DP-3 --mode 1920x1080 --right-of HDMI-0
 
-    bspc monitor HDMI-A-0 -d I II III IV V VI VII VIII IX X
-    bspc monitor DisplayPort-2 -d XI XII XIII XIV XV XVI XVII XVIII XIX XX 
+    bspc monitor HDMI-0 -d I II III IV V VI VII VIII IX X
+    bspc monitor DP-3 -d XI XII XIII XIV XV XVI XVII XVIII XIX XX 
 elif [[ $NUM_OF_DESKTOPS -eq 3 ]]; then
     xrandr --output HDMI-A-0 --mode 1920x1080 --primary --output DisplayPort-2 --mode 1920x1080 --right-of HDMI-A-0 --output DVI-D-0 --mode 1920x1080 --left-of HDMI-A-0
 
@@ -41,5 +41,5 @@ bspc config external_rules_command /home/jp/.config/bspwm/external_rules.sh
 
 ## AutoStart
 setBackground &
-compton &
+picom &
 menu_bar &

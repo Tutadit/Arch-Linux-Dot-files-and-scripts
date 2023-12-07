@@ -7,7 +7,31 @@ instance=$3
 title=$(xdotool getwindowname $wid)
 
 case "$instance.$class.$title" in
-*-studio)
+    *[wW]hats[aA]pp*)
+	echo "state = tiled"
+	echo "desktop = ^20"
+    ;;
+*wa:laravel*)
+    echo "state = tiled"
+    echo "desktop = ^13"
+    ;;
+*wa:localhost*)
+    echo "state = tiled"
+    echo "desktop = ^11"
+;;
+*wa:tailwindcss*)
+    echo "state = tiled"
+    echo "desktop = ^12"
+;;  
+*wa:hostwinds*)
+    echo "state = tiled"
+    echo "desktop = ^20"
+;;
+*[iI]nkscape*)
+    echo "state = tiled"
+    echo "desktop = ^18"
+;;
+*-studio*)
 	echo "state = tiled"
 ;;	
 *wa:google*)
