@@ -69,6 +69,7 @@ launch() {
 
 regex_url='^((http[s]?|ftp):\/\/)?\/?([^\/\.]+\.)*?(([^\/\.]+)\.[^:\/\s\.]{2,3}(\.[^:\/\s\.]{2,3})?)(:[0-9]+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$'
 regex_localhost='^(http[s]?:\/\/)?(localhost|([0-9]+)(\.[0-9]+)*)(:[0-9]+)?(\/.*)?$'
+regex_file='^(file:\/\/)?(\/.*)$'
 
 clear_history() {
     echo "" >$WEBAPPS_HISTORY
@@ -84,15 +85,15 @@ launch_webapp() {
     in_history=$(cat $WEBAPPS_HISTORY | grep "$query")
     if [[ $in_history == "" ]]; then
         echo -ne "$query\n" >>$WEBAPPS_HISTORY
-    else             
-        gawk -i inplace "!/$query/" $WEBAPPS_HISTORY        
-        echo -ne "$query\n" >> $WEBAPPS_HISTORY
+    else
+        gawk -i inplace "!/$query/" $WEBAPPS_HISTORY
+        echo -ne "$query\n" >>$WEBAPPS_HISTORY
     fi
     webapp_name=${1%% *}
     webapp_data=$(cat $WEBAPPS_FILE | grep -e "^$webapp_name ")
     if [[ -z $webapp_data ]]; then
-        if [[ $webapp_name =~ $regex_url ]]; then            
-            webapp_name="${BASH_REMATCH[5]}"            
+        if [[ $webapp_name =~ $regex_url ]]; then
+            webapp_name="${BASH_REMATCH[5]}"
             webapp_data=$(cat $WEBAPPS_FILE | grep -e "^$webapp_name")
             if [[ -z $webapp_data ]]; then
                 webapp_url="${BASH_REMATCH[4]}"
@@ -104,26 +105,36 @@ launch_webapp() {
                 webapp_name=$(echo $webapp_data | awk '{print $1;}')
                 webapp_profile_dir="$PROFILES_DIR/$webapp_name"
             fi
+        elif [[ $webapp_name =~ $regex_localhost ]]; then
+            webapp_url=${1%% *}
+            webapp_name="localhost"
+            webapp_profile_dir="$PROFILES_DIR/localhost"
+        elif [[ $webapp_name =~ $regex_file ]]; then
+            webapp_url=${1%% *}
+            webapp_name="file"
+            webapp_profile_dir="$PROFILES_DIR/file"
+
         else
-            if [[ $webapp_name =~ $regex_localhost ]]; then
-                webapp_url=${1%% *}
-                webapp_name="localhost"
-                webapp_profile_dir="$PROFILES_DIR/localhost"
-            else
-                webapp_url="http://www.google.com/search?q="
-                query=$(sed 's/ /+/g' <<<"$@")
-                webapp_url="${webapp_url}${query}"
-                webapp_profile_dir="$PROFILES_DIR/google"
-                webapp_name="google"
-            fi
+            webapp_url="http://www.google.com/search?q="
+            query=$(sed 's/ /+/g' <<<"$@")
+            webapp_url="${webapp_url}${query}"
+            webapp_profile_dir="$PROFILES_DIR/google"
+            webapp_name="google"
         fi
     else
         webapp_name=$(echo $webapp_data | awk '{print $1;}')
         webapp_url=$(echo $webapp_data | awk 'NF>1{print $NF}')
         webapp_profile_dir="$PROFILES_DIR/$webapp_name"
     fi
+
+    if [ ! -d "$webapp_profile_dir" ]; then
+        mkdir -p "$webapp_profile_dir/chrome"
+        cp "$WEBAPPS_PRESETS/prefs.js" "$webapp_profile_dir/prefs.js"
+        cp "$WEBAPPS_PRESETS/userChrome.css" "$webapp_profile_dir/chrome/userChrome.css"
+    fi
+
     firefox --profile "$webapp_profile_dir" --class "wa:$webapp_name" $webapp_url &
-    echo $! >> $PROFILES_DIR/$webapp_name/pid
+    echo $! >>$PROFILES_DIR/$webapp_name/pid
 }
 
 if [[ $# -eq 0 ]]; then
