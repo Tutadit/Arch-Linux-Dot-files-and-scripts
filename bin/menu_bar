@@ -44,22 +44,6 @@ display() {
     echo -ne "%{r}$date    "
 }
 
-
-timetrack() {
-    find_key="Tracking"
-    tracking=$(timew | grep $find_key)
-
-    if [[ -z $tracking ]]; then
-        return 
-    fi
-
-    echo -ne "%{l}    "
-    tracking=${tracking#"$find_key"}
-    time_tracked=$(timew | grep Total | grep -oP "\\d+:\d+:\d+")
-    echo -ne "$md_timer: $tracking $time_tracked"
-        
-}
-
 ws() {
     if [ "$1" = "all" ]; then
         DESKTOPS="I II III IV V VI VII VIII IX X"
@@ -87,9 +71,12 @@ ws() {
         elif [ $NUM_OF_WINDOWS = "1" ]; then
             WINDOW_TITLE=$(xdotool getwindowname "$WINDOWS")
             case "$WINDOW_TITLE" in
+            *[wW]hats[aA]pp*)
+                echo -ne "$fa_whatsapp "
+                ;;
             *[sS]lack*)
                 echo -ne "$fa_slack "
-            ;;
+                ;;
             *[Ww]hiteboard*)
                 echo -ne "$fa_pencil  "
                 ;;
@@ -120,7 +107,9 @@ ws() {
             *[Ss]potify*)
                 echo -ne "$fa_spotify "
                 ;;
-
+            *[iI]nkscape*)
+                echo -ne "$linea_software_vector_box "
+                ;;
             *)
 
                 echo -ne "$fa_square  "
@@ -133,14 +122,17 @@ ws() {
             code=false
             w3m=false
             timelord=false
-
+            whatsapp=false
             for window in $WINDOWS; do
                 WINDOW_NAME=$(xdotool getwindowname $window 2>/dev/null)
                 if [ -z "$WINDOW_NAME" ]; then
                     continue
                 fi
-
+                echo $WINDOW_NAME >> /home/jp/lol
                 case $WINDOW_NAME in
+                *[wW]hats[aA]pp*)
+                    whatsapp=true
+                    ;;
                 *Timelord*)
                     timelord=true
                     ;;
@@ -174,6 +166,8 @@ ws() {
                 echo -ne "$md_developer_mode  "
             elif [ $alacritty = true ]; then
                 echo -ne "$file_terminal  "
+            elif [ $whatsapp = true ]; then 
+                echo -ne "$fa_whatsapp  "
             else
                 echo -ne "$fa_th_large  "
             fi
@@ -186,7 +180,7 @@ ws() {
 }
 
 music() {
-    if playerctl metadata > /dev/null 2>&1; then
+    if playerctl metadata >/dev/null 2>&1; then
         INFO=$(playerctl metadata)
 
         TITLE=$(sed '9q;d' <<<"$INFO")
@@ -218,7 +212,7 @@ battery() {
         echo -ne "$fa_bolt  "
     fi
 
-    if [ $capacity -gt 90 ]; then 
+    if [ $capacity -gt 90 ]; then
         echo -ne "$fa_battery "
     elif [ $capacity -gt 80 ]; then
         echo -ne "$fa_battery_3 "
@@ -229,7 +223,7 @@ battery() {
     else
         echo -ne "$fa_battery_0 "
     fi
-    
+
     echo -ne "$capacity"
 
 }
@@ -245,9 +239,11 @@ RUN=true
 
 function cleanup() {
     RUN=false
+    clear_pipe
 }
 
 trap cleanup EXIT
+trap cleanup SIGINT SIGTERM
 
 while $RUN; do
     source /home/jp/.cache/wal/colors.var.sh
@@ -261,8 +257,7 @@ while $RUN; do
             if [[ $tmp == 1 ]]; then
                 echo -ne "$(keyboard)"
                 echo -ne "$(display)"
-            else
-                echo -ne "$(timetrack)"
+            else                
                 echo -ne "$(music)"
             fi
             echo -ne "$(ws $m)"
